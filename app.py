@@ -9,7 +9,7 @@ from flask import (
 )
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.types import String
-from sqlalchemy import cast
+from sqlalchemy import cast, func
 
 ##############
 # Flask set up
@@ -53,6 +53,15 @@ class SamplesMeta(db.Model):
 
     def __repr__(self):
         return '<BellyButton %r>' % (self.gender)
+
+class Otu(db.Model):
+    __tablename__ = 'otu'
+
+    otu_id = db.Column(db.Integer, primary_key=True)
+    lowest_taxonomic_unit_found = db.Column(db.String)
+
+    def __repr__(self):
+        return '<Otu %r>' % (self.otu_id)
 
 
 class Samples(db.Model):
@@ -221,28 +230,23 @@ def index():
 
 @app.route("/names")
 def bellybutton_name():
-    results = db.session.query(cast(SamplesMeta.sampleid, String)).all()
+
+    #Write a query to filter out all sample ids with BB_ concated to it and return a list
+    results = db.session.query("BB_" + cast(SamplesMeta.sampleid, String)).all()
 
     all_sampleids = list(np.ravel(results))
 
     return jsonify(all_sampleids)
-# """List of sample names.
 
-#     Returns a list of sample names in the format
-#     [
-#         "BB_940",
-#         "BB_941",
-#         "BB_943",
-#         "BB_944",
-#         "BB_945",
-#         "BB_946",
-#         "BB_947",
-#         ...
-#     ]
+@app.route('/otu')
+def bellybutton_otu():
 
-#     """
+    #Write a query to list all otu descriptions from the otu table 
+    results = db.session.query(Otu.lowest_taxonomic_unit_found).all()
 
-# @app.route('/otu')
+    all_otu = list(np.ravel(results))
+
+    return jsonify(all_otu)
 
 
 # @app.route('/metadata/<sample>')
