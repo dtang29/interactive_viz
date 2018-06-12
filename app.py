@@ -249,21 +249,39 @@ def bellybutton_otu():
     return jsonify(all_otu)
 
 
-# @app.route('/metadata/<sample>')
-#     """MetaData for a given sample.
+@app.route('/metadata/<sample>')
+def bellybutton_metadata_sample(sample):
 
-#     Args: Sample in the format: `BB_940`
+    #grab all the columns we need and create a list
+    sel = [SamplesMeta.age,
+        SamplesMeta.bbtype,
+        SamplesMeta.ethnicity,
+        SamplesMeta.gender,
+        SamplesMeta.location,
+        SamplesMeta.sampleid]
 
-#     Returns a json dictionary of sample metadata in the format
+    #Query the above columns for the sample id provided by user
+    results = db.session.query(*sel).\
+                filter(SamplesMeta.sampleid == sample).all()
+    print(results)
 
-#     {
-#         AGE: 24,
-#         BBTYPE: "I",
-#         ETHNICITY: "Caucasian",
-#         GENDER: "F",
-#         LOCATION: "Beaufort/NC",
-#         SAMPLEID: 940
-#     }"""
+    #Create an empty list to store a dictionary
+    all_samples = []
+
+    #Create a dictionary to store the values pulled from results
+    samples_dict = {}
+
+    #Access each element within results to grab the data for each column
+    samples_dict["AGE"] = results[0][0]
+    samples_dict["BBTYPE"] = results[0][1]
+    samples_dict["ETHNICITY"] = results[0][2]
+    samples_dict["GENDER"] = results[0][3]
+    samples_dict["LOCATION"] = results[0][4]
+    samples_dict["SAMPLEID"] = results[0][5]
+    all_samples.append(samples_dict)
+
+    return jsonify(all_samples)
+
 
 # @app.route('/wfreq/<sample>')
 #     """Weekly Washing Frequency as a number.
