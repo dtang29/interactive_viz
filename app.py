@@ -283,13 +283,24 @@ def bellybutton_metadata_sample(sample):
     return jsonify(all_samples)
 
 
-# @app.route('/wfreq/<sample>')
+@app.route('/wfreq/<sample>')
+def bellybutton_wfreq(sample):
+
+    results = db.session.query(SamplesMeta.wfreq).\
+                filter("BB_" + SamplesMeta.sampleid == "BB_" + sample).all()
+
+    wfreq_list = []
+    wfreq_dict = {}
+    wfreq_dict["wfreq"] = results
+    wfreq_list.append(wfreq_dict)
+    return jsonify(wfreq_list)
 #     """Weekly Washing Frequency as a number.
 
 #     Args: Sample in the format: `BB_940`
 
 #     Returns an integer value for the weekly washing frequency `WFREQ`
 #     """
+
 
 # @app.route('/samples/<sample>')
 #     """OTU IDs and Sample Values for a given sample.
